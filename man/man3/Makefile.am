@@ -8,6 +8,7 @@ SoDB.3: $(top_builddir)/docs/coin.doxygen
 	"$(sim_ac_doxygen_exe)" docs/coin.doxygen )
 
 filelist.txt: SoDB.3
+	rm -f *_.3
 	ls *.3 >filelist.txt
 
 
