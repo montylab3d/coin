@@ -816,7 +816,7 @@ SoCamera::handleEvent(SoHandleEventAction * action)
 }
 
 /*!
-  "Jitter" the camera according to the current rendering pass (\a
+  \"Jitter\" the camera according to the current rendering pass (\a
   curpass), to get an antialiased rendering of the scene when doing
   multipass rendering.
 */
