@@ -63,6 +63,7 @@ public:
   void setPixelsPerInch(float ppi);
   float getPixelsPerInch(void) const;
   float getPixelsPerPoint(void) const;
+  constexpr SbViewportRegion & operator=(const SbViewportRegion & vpReg) = default;
   friend COIN_DLL_API int operator ==(const SbViewportRegion & reg1,
                                       const SbViewportRegion & reg2);
 

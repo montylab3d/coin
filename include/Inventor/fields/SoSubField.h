@@ -67,7 +67,7 @@ public: \
   virtual SoType getTypeId(void) const; \
  \
   virtual void copyFrom(const SoField & field); \
-  const _class_ & operator=(const _class_ & field); \
+  const _class_ & operator=(const _class_ & field);       \
   virtual SbBool isSame(const SoField & field) const
 
 
