@@ -97,6 +97,11 @@ option(COIN_VERBOSE "Add verbose debugging information during the configure proc
 option(HAVE_MULTIPLE_VERSION "Forces versioned paths for includes and documentation when ON, usual behaviour otherwise." OFF)
 option(COIN_USE_CPACK "If enabled the cpack subrepo is mandatory" OFF)
 
+# Per this thread, Coin provides a dummy GLX implementation which causes issues
+# when running under Wayland so we disable it by default.
+# https://forum.freecadweb.org/viewtopic.php?f=8&t=33359#p279513
+option(COIN_BUILD_GLX "Build GLX when ON.  Default is OFF." OFF)
+
 cmake_dependent_option(COIN_BUILD_MAC_FRAMEWORK "Build framework instead of dylib on Mac OS X when ON. Only valid if COIN_BUILD_SHARED_LIBS is ON." OFF "APPLE;NOT IOS;COIN_BUILD_SHARED_LIBS" OFF)
 cmake_dependent_option(COIN_BUILD_MAC_X11 "Build for X11 on Mac OS X when ON. Default is OFF." OFF "APPLE" OFF)
 cmake_dependent_option(COIN_BUILD_MAC_AGL "Build for AGL on Mac OS X when ON. Default is OFF." OFF "APPLE" OFF)
@@ -635,7 +640,7 @@ if(WIN32)
   " HAVE_WGL)
 elseif(APPLE)
   set(CMAKE_REQUIRED_LIBRARIES ${COIN_TARGET_LINK_LIBRARIES})
-  if(COIN_BUILD_MAC_X11)
+  if(COIN_BUILD_MAC_X11 AND COIN_BUILD_GLX)
     check_cxx_source_compiles("
       #include <GL/gl.h>
       #include <GL/glx.h>
@@ -668,19 +673,23 @@ elseif(APPLE)
 endif()
 
 if(NOT (HAVE_WGL OR HAVE_AGL OR HAVE_CGL OR HAVE_GLX))
-  if (NOT TARGET OpenGL::GLX)
-    if (OPENGL_glx_LIBRARY)
-      list(APPEND COIN_TARGET_LINK_LIBRARIES ${OPENGL_glx_LIBRARY})
+  if (COIN_BUILD_GLX)
+    if (NOT TARGET OpenGL::GLX)
+      if (OPENGL_glx_LIBRARY)
+	list(APPEND COIN_TARGET_LINK_LIBRARIES ${OPENGL_glx_LIBRARY})
+      endif()
+    else()
+      list(APPEND COIN_TARGET_LINK_LIBRARIES OpenGL::GLX)
     endif()
-  else()
-    list(APPEND COIN_TARGET_LINK_LIBRARIES OpenGL::GLX)
   endif()
   set(CMAKE_REQUIRED_LIBRARIES ${COIN_TARGET_LINK_LIBRARIES})
-  check_cxx_source_compiles("
+  if (COIN_BUILD_GLX)
+    check_cxx_source_compiles("
     #include <GL/gl.h>
     #include <GL/glx.h>
     int main() { (void)glXChooseVisual(0L, 0, 0L); glEnd(); return 0; }
   " HAVE_GLX)
+    endif()
 endif()
 
 # Checks specific OpenGL configurations
