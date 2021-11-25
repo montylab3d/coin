@@ -1,17 +1,12 @@
 Name:           Coin4
-Version:        4.0.1
-Release:        pre0-git{{{ git_head_short }}}%{?dist}
+Version:        {{{git_last_tag}}}.bleed^{{{git_last_tag_commits}}}.{{{git_head_short}}}
+Release:        1%{?dist}
 Summary:        High-level 3D visualization library
 
 License:        BSD and GPLv3+
-URL:            https://github.com/montylab3d3d/coin/
-Source0:        {{{ git_pack_repo }}}
-Source0:        https://github.com/coin3d/coin/releases/download/Coin-%{version}/coin-%{version}-pre0-src.tar.gz
-
-# Per this thread Coin provides a dummy GLX implementation which causes issues
-# when running under Wayland so we patch it out.
-# https://forum.freecadweb.org/viewtopic.php?f=8&t=33359#p279513
-Patch12:        coin-no_glx.patch
+URL:            https://github.com/montylab3d/coin/
+Source0:        {{{ git_pack path=$GIT_ROOT dir_name=coin source_name=coin.tgz}}}
+Source1:        {{{ git_pack path=$GIT_ROOT/cpack.d dir_name=coin/cpack.d source_name=cpack.tgz }}}
 
 
 BuildRequires:  cmake
@@ -58,7 +53,7 @@ Summary:        HTML developer documentation for Coin
 
 
 %prep
-%autosetup -p1 -n coin
+{{{ git_setup_macro dir_name=coin source_indices=0,1 }}}
 
 # Update doxygen configuration
 doxygen -u docs/coin.doxygen.in
@@ -138,7 +133,7 @@ fi
 
 
 %files
-%doc AUTHORS ChangeLog README{,.UNIX} THANKS FAQ*
+%doc AUTHORS ChangeLog README{.md,.UNIX} THANKS FAQ*
 %license COPYING
 %dir %{_datadir}/Coin
 %dir %{_datadir}/Coin4
@@ -151,7 +146,7 @@ fi
 %ghost %{_libdir}/libCoin.so
 %ghost %{_libdir}/pkgconfig/Coin.pc
 %{_includedir}/Coin4/
-%{_libdir}/cmake/Coin-%{version}/
+%{_libdir}/cmake/Coin-4.*/
 %{_libdir}/Coin4/coin-config
 %{_libdir}/pkgconfig/Coin4.pc
 %dir %{_datadir}/Coin4
